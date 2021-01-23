@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <title>
+            codenames
+        </title>
+        <script src="./words.js"> </script>
+        <link rel="stylesheet" href="./style.css">
+        <script>
+            let wordsWrapper;
+            let score1 = 0;
+            let score2 = 0;
+            clickedCards = [];
+            function init() {
+                document.querySelector('#team1Name').innerHTML = `${team1} `;
+                document.querySelector('#team2Name').innerHTML = `${team2} `;
+
+                wordsWrapper = document.querySelector('.words-wrapper');
+                wordsWrapper.innerHTML = words.map((word,index) => {
+                    const id = `word${index}`
+                    const wordHTML = 
+                    `<div id="${id}" onclick="wordClicked('${word.text}', '${word.team}', '${id}' )" class="word-wrapper">
+                        <label>
+                            ${word.text}   
+
+                            </label>
+                    </div>`;
+                    return wordHTML;
+
+
+                }).reduce(( acc, cur ) => acc + cur );
+
+              const stored=  localStorage.getItem('clickedCards');
+              if(stored) {
+                  clickedCards = JSON.parse(stored);
+                  clickedCards.forEach(element => {
+                    wordClicked(element.text,element.team,element.id);
+                  });
+              }
+
+
+
+            }
+
+            function wordClicked(text,team,id) {
+                    const element = document.querySelector(`#${id}`);
+                    element.classList.add('active');
+                    element.classList.add(team);
+                    if(team === 'team1') {
+                        score1 ++;
+                    } else if (team === 'team2') {
+                        score2 ++;
+                    }
+                    if(!clickedCards.find(e => e.text === text)) {
+                    clickedCards.push({text,team,id});
+                    localStorage.setItem('clickedCards', JSON.stringify(clickedCards));
+                    }
+                 
+                    updateScores();
+
+            }
+
+            function updateScores() {
+                document.getElementById('blueScore').innerHTML = score1;
+                document.getElementById('redScore').innerHTML = score2;
+
+            }
+
+            function restart() {
+                var r = confirm("Are you sure to restart?");
+                if (r == true) {
+                    localStorage.removeItem('clickedCards');
+                    location.replace('./index.html');
+                } else {
+               
+                }
+            }
+        </script>
+    </head>
+  
+</html>
+
+<body onload="init()">
+    <div class="scores">
+        <div class="score team1">
+            <div id="team1Name"></div>&nbsp;Score: &nbsp;<div id="blueScore">
+                0
+            </div>
+        </div>
+
+        <button onclick="restart()" class="restart">
+            Restart
+        </button>
+        <div   class="score team2">
+            <div id="team2Name"></div>&nbsp;Score:&nbsp; <div id="redScore">
+                0
+            </div>
+        </div>
+    </div>
+    <div class="words-wrapper">
+
+    </div>
+</body>
